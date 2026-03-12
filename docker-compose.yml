@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: newsscreener-postgres
+    environment:
+      POSTGRES_USER: newsscreener
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: newsscreener
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newsscreener"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: newsscreener-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: newsscreener-app
+    environment:
+      NS_DATABASE_URL: postgresql+asyncpg://newsscreener:password@postgres:5432/newsscreener
+      NS_REDIS_URL: redis://redis:6379/0
+      NS_POLYGON_API_KEY: ${NS_POLYGON_API_KEY}
+      NS_OPENROUTER_API_KEY: ${NS_OPENROUTER_API_KEY}
+      NS_NEWSGUARD_API_KEY: ${NS_NEWSGUARD_API_KEY:-}
+      NS_LOG_LEVEL: ${NS_LOG_LEVEL:-INFO}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    command: uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: newsscreener-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
+  redis_data:
