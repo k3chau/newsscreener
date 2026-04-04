@@ -5,10 +5,8 @@ import FilterSidebar from './components/FilterSidebar'
 import ArticleFeed from './components/ArticleFeed'
 import ArticleDetail from './components/ArticleDetail'
 import MacroCalendar from './components/MacroCalendar'
-import SectorHeatmap from './components/SectorHeatmap'
-import SourceLeaderboard from './components/SourceLeaderboard'
-import KeywordTrends from './components/KeywordTrends'
 import AlertConfig from './components/AlertConfig'
+import TradingViewHeatmap from './components/TradingViewHeatmap'
 
 const WS_URL =
   (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
@@ -186,16 +184,7 @@ export default function App() {
       {/* Macro Calendar */}
       <MacroCalendar visible={calendarVisible} />
 
-      {/* Analytics panel */}
-      {showAnalytics && (
-        <div className="bg-card border-b border-border px-4 lg:px-6 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-            <SectorHeatmap articles={filtered} />
-            <SourceLeaderboard articles={filtered} />
-            <KeywordTrends />
-          </div>
-        </div>
-      )}
+
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden relative">
@@ -236,6 +225,11 @@ export default function App() {
         ticker={alertTicker}
         watchlist={watchlist}
       />
+
+      {/* TradingView Heatmap full page */}
+      {showAnalytics && (
+        <TradingViewHeatmap onClose={() => setShowAnalytics(false)} />
+      )}
     </div>
   )
 }
