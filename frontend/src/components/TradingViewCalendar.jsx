@@ -25,7 +25,7 @@ export default function TradingViewCalendar({ onClose }) {
     script.async = true
     script.innerHTML = JSON.stringify({
       colorTheme: 'dark',
-      isTransparent: true,
+      isTransparent: false,
       locale: 'en',
       importanceFilter: '-1,0,1',
       countryFilter: 'us,eu,gb,jp,cn,ca,au,de,fr',
