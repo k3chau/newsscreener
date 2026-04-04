@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY
-const MODEL = 'qwen/qwen3-235b-a22b:free'
+const MODEL = 'qwen/qwen3-30b-a3b:free'
 
 export default function AIChat({ context = '', contextType = 'general' }) {
   const [messages, setMessages] = useState([])
@@ -60,6 +60,13 @@ Be concise but thorough. Use specific examples when helpful. If asked about live
     setLoading(true)
 
     try {
+      console.log('[v0] API Key present:', !!OPENROUTER_API_KEY)
+      console.log('[v0] API Key length:', OPENROUTER_API_KEY?.length || 0)
+      
+      if (!OPENROUTER_API_KEY) {
+        throw new Error('OpenRouter API key is not configured')
+      }
+
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -80,21 +87,27 @@ Be concise but thorough. Use specific examples when helpful. If asked about live
         })
       })
 
+      console.log('[v0] Response status:', response.status)
+
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+        const errorText = await response.text()
+        console.error('[v0] API error response:', errorText)
+        throw new Error(`API error: ${response.status} - ${errorText}`)
       }
 
       const data = await response.json()
+      console.log('[v0] Response data:', data)
+      
       const assistantMessage = {
         role: 'assistant',
         content: data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.'
       }
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
-      console.error('Chat error:', error)
+      console.error('[v0] Chat error:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Sorry, there was an error connecting to the AI service. Please check your API key and try again.'
+        content: `Error: ${error.message}. Please check your API key and try again.`
       }])
     } finally {
       setLoading(false)
