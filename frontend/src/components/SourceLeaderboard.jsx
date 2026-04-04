@@ -31,55 +31,55 @@ export default function SourceLeaderboard({ articles }) {
         article_count: d.count,
       }))
       .sort((a, b) => b.avg_credibility - a.avg_credibility)
-      .slice(0, 20)
+      .slice(0, 10)
   }, [articles])
 
-  if (leaderboard.length === 0) {
-    return (
-      <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">Source Leaderboard</h3>
-        <p className="text-xs text-gray-400">No publisher data</p>
-      </div>
-    )
-  }
-
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-gray-700 mb-2">Source Leaderboard</h3>
-      <div className="overflow-y-auto max-h-64">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-left text-gray-500 border-b border-gray-200">
-              <th className="pb-1 pr-2 w-8">#</th>
-              <th className="pb-1 pr-2">Publisher</th>
-              <th className="pb-1 pr-2 w-28">Credibility</th>
-              <th className="pb-1 w-12 text-right">Articles</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.map((row, i) => (
-              <tr key={row.publisher} className="border-b border-gray-100">
-                <td className="py-1.5 pr-2 text-gray-400 font-medium">{i + 1}</td>
-                <td className="py-1.5 pr-2 text-gray-800 truncate max-w-[150px]" title={row.publisher}>
+    <div className="bg-muted/30 rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+        <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+        </svg>
+        Source Leaderboard
+      </h3>
+      
+      {leaderboard.length === 0 ? (
+        <p className="text-xs text-muted-foreground">No publisher data</p>
+      ) : (
+        <div className="space-y-2">
+          {leaderboard.map((row, i) => (
+            <div key={row.publisher} className="flex items-center gap-3">
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                i === 0 ? 'bg-primary text-primary-foreground' 
+                : i === 1 ? 'bg-muted-foreground text-background'
+                : i === 2 ? 'bg-warning text-warning-foreground'
+                : 'bg-muted text-muted-foreground'
+              }`}>
+                {i + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-foreground truncate" title={row.publisher}>
                   {row.publisher}
-                </td>
-                <td className="py-1.5 pr-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all"
-                        style={{ width: `${row.avg_credibility}%` }}
-                      />
-                    </div>
-                    <span className="text-gray-600 w-7 text-right">{row.avg_credibility}</span>
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex-1 bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        row.avg_credibility >= 70 ? 'bg-success'
+                        : row.avg_credibility >= 40 ? 'bg-warning'
+                        : 'bg-destructive'
+                      }`}
+                      style={{ width: `${row.avg_credibility}%` }}
+                    />
                   </div>
-                </td>
-                <td className="py-1.5 text-right text-gray-600">{row.article_count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  <span className="text-xs text-muted-foreground w-8">{row.avg_credibility}</span>
+                </div>
+              </div>
+              <span className="text-xs text-muted-foreground">{row.article_count}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

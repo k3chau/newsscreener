@@ -10,9 +10,9 @@ function getSentiment(article) {
 }
 
 const SENTIMENT_BG = {
-  positive: 'bg-green-100 border-green-300 text-green-900',
-  negative: 'bg-red-100 border-red-300 text-red-900',
-  neutral: 'bg-gray-100 border-gray-300 text-gray-700',
+  positive: 'bg-success/20 border-success/30 text-success',
+  negative: 'bg-destructive/20 border-destructive/30 text-destructive',
+  neutral: 'bg-muted border-border text-muted-foreground',
 }
 
 export default function SectorHeatmap({ articles }) {
@@ -42,14 +42,19 @@ export default function SectorHeatmap({ articles }) {
   }, [articles])
 
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-gray-700 mb-2">Sector Heatmap</h3>
-      <div className="grid grid-cols-4 gap-2">
+    <div className="bg-muted/30 rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+        <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+        </svg>
+        Sector Heatmap
+      </h3>
+      <div className="grid grid-cols-3 lg:grid-cols-4 gap-2">
         {sectorData.map(({ sector, total, dominant }) => (
           <div
             key={sector}
-            className={`rounded-lg border px-3 py-2 text-center ${
-              total === 0 ? 'bg-gray-50 border-gray-200 text-gray-400' : SENTIMENT_BG[dominant]
+            className={`rounded-lg border px-3 py-2 text-center transition-all hover:scale-105 ${
+              total === 0 ? 'bg-muted/50 border-border text-muted-foreground' : SENTIMENT_BG[dominant]
             }`}
           >
             <p className="text-xs font-medium truncate" title={sector}>

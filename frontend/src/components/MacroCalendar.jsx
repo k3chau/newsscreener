@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 
 const IMPACT_STYLES = {
-  high: 'bg-red-100 text-red-700 border-red-200',
-  medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  low: 'bg-gray-100 text-gray-500 border-gray-200',
+  high: 'bg-destructive/20 text-destructive',
+  medium: 'bg-warning/20 text-warning',
+  low: 'bg-muted text-muted-foreground',
 }
 
 const IMPACT_DOT = {
-  high: 'bg-red-500',
-  medium: 'bg-yellow-500',
-  low: 'bg-gray-400',
+  high: 'bg-destructive',
+  medium: 'bg-warning',
+  low: 'bg-muted-foreground',
 }
 
 function isToday(dateStr) {
@@ -62,7 +62,7 @@ export default function MacroCalendar({ visible }) {
       } else {
         setEvents(data.events || [])
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch calendar events')
     } finally {
       setLoading(false)
@@ -78,7 +78,6 @@ export default function MacroCalendar({ visible }) {
 
   if (!visible) return null
 
-  // Group events by date
   const grouped = {}
   for (const ev of events) {
     const dateKey = ev.date ? ev.date.slice(0, 10) : 'Unknown'
@@ -87,30 +86,43 @@ export default function MacroCalendar({ visible }) {
   }
 
   return (
-    <div className="bg-white border-b border-gray-200">
-      <div className="px-6 py-3">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-gray-700">Macro Economic Calendar</h2>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+    <div className="bg-card border-b border-border">
+      <div className="px-4 lg:px-6 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Macro Economic Calendar
+          </h2>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-red-500" /> High
+              <span className="inline-block w-2 h-2 rounded-full bg-destructive" /> High
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" /> Med
+              <span className="inline-block w-2 h-2 rounded-full bg-warning" /> Med
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-gray-400" /> Low
+              <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground" /> Low
             </span>
-            {loading && <span className="text-blue-500">Updating...</span>}
+            {loading && (
+              <span className="text-primary flex items-center gap-1">
+                <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Updating...
+              </span>
+            )}
           </div>
         </div>
 
         {error && (
-          <p className="text-xs text-red-500 mb-2">{error}</p>
+          <p className="text-xs text-destructive mb-2">{error}</p>
         )}
 
         {events.length === 0 && !loading && !error && (
-          <p className="text-xs text-gray-400">No upcoming events</p>
+          <p className="text-xs text-muted-foreground">No upcoming events</p>
         )}
 
         {Object.keys(grouped).length > 0 && (
@@ -119,30 +131,30 @@ export default function MacroCalendar({ visible }) {
               const today = isToday(dateKey)
               return (
                 <div key={dateKey}>
-                  <p className={`text-xs font-medium mb-1 ${today ? 'text-blue-600' : 'text-gray-500'}`}>
+                  <p className={`text-xs font-medium mb-2 ${today ? 'text-primary' : 'text-muted-foreground'}`}>
                     {formatDate(dateKey)}{today ? ' (Today)' : ''}
                   </p>
                   <div className="space-y-1">
                     {dateEvents.map((ev, i) => (
                       <div
                         key={`${dateKey}-${i}`}
-                        className={`flex items-center gap-3 px-3 py-1.5 rounded text-xs border ${
-                          today ? 'bg-blue-50 border-blue-100' : 'border-gray-100'
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs ${
+                          today ? 'bg-primary/10 border border-primary/20' : 'bg-muted/50'
                         }`}
                       >
                         <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${IMPACT_DOT[ev.impact] || IMPACT_DOT.low}`} />
-                        <span className="text-gray-400 w-12 shrink-0">{formatTime(ev.date)}</span>
-                        <span className="font-medium text-gray-800 flex-1 truncate">{ev.event}</span>
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${IMPACT_STYLES[ev.impact] || IMPACT_STYLES.low}`}>
+                        <span className="text-muted-foreground w-12 shrink-0 font-mono">{formatTime(ev.date)}</span>
+                        <span className="font-medium text-foreground flex-1 truncate">{ev.event}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase ${IMPACT_STYLES[ev.impact] || IMPACT_STYLES.low}`}>
                           {ev.impact}
                         </span>
-                        <span className="text-gray-500 w-16 text-right" title="Actual">
+                        <span className="text-foreground w-16 text-right font-mono" title="Actual">
                           {formatValue(ev.actual)}
                         </span>
-                        <span className="text-gray-400 w-16 text-right" title="Forecast">
+                        <span className="text-muted-foreground w-16 text-right font-mono" title="Forecast">
                           {formatValue(ev.forecast)}
                         </span>
-                        <span className="text-gray-400 w-16 text-right" title="Previous">
+                        <span className="text-muted-foreground w-16 text-right font-mono" title="Previous">
                           {formatValue(ev.previous)}
                         </span>
                       </div>
