@@ -5,10 +5,9 @@ import FilterSidebar from './components/FilterSidebar'
 import ArticleFeed from './components/ArticleFeed'
 import ArticleDetail from './components/ArticleDetail'
 import MacroCalendar from './components/MacroCalendar'
-import SectorHeatmap from './components/SectorHeatmap'
-import SourceLeaderboard from './components/SourceLeaderboard'
-import KeywordTrends from './components/KeywordTrends'
 import AlertConfig from './components/AlertConfig'
+import TradingViewHeatmap from './components/TradingViewHeatmap'
+import TradingViewCalendar from './components/TradingViewCalendar'
 
 const WS_URL =
   (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
@@ -37,7 +36,6 @@ function get(article, path) {
 }
 
 function matchFilters(article, filters, watchlist) {
-  // If watchlist has tickers and no manual ticker filter, filter to watchlist
   const tickerFilter = filters.ticker
   const tickers = get(article, 'raw.tickers') || get(article, 'tickers') || []
 
@@ -71,11 +69,12 @@ export default function App() {
   const [selectedArticle, setSelectedArticle] = useState(null)
   const [calendarVisible, setCalendarVisible] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showEconomicCalendar, setShowEconomicCalendar] = useState(false)
   const [alertModalOpen, setAlertModalOpen] = useState(false)
   const [alertTicker, setAlertTicker] = useState('')
   const [alertRules, setAlertRules] = useState([])
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Fetch alert rules on mount to show bell state in sidebar
   useEffect(() => {
     fetch('/api/v1/alerts/config')
       .then((r) => r.ok ? r.json() : { rules: [] })
@@ -96,54 +95,93 @@ export default function App() {
     saveWatchlist(loadWatchlist().filter((x) => x !== t))
   }, [saveWatchlist])
 
+  const reorderWatchlist = useCallback((fromIndex, toIndex) => {
+    const newList = [...watchlist]
+    const [removed] = newList.splice(fromIndex, 1)
+    newList.splice(toIndex, 0, removed)
+    saveWatchlist(newList)
+  }, [watchlist, saveWatchlist])
+
   const filtered = useMemo(
     () => articles.filter((a) => matchFilters(a, filters, watchlistActive ? watchlist : [])),
     [articles, filters, watchlist, watchlistActive]
   )
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-900">News Screener</h1>
-        <div className="flex items-center gap-4 text-sm">
+      <header className="bg-card border-b border-border px-4 lg:px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {/* Mobile menu button */}
           <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg bg-muted text-foreground hover:bg-secondary transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h1 className="text-lg font-bold text-foreground">News Screener</h1>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 lg:gap-4">
+          {/* Toggle buttons */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
               onClick={() => setShowAnalytics(!showAnalytics)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 showAnalytics
-                  ? 'bg-indigo-100 text-indigo-700 border-indigo-300'
-                  : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
               Analytics
             </button>
-          <button
-              onClick={() => setCalendarVisible(!calendarVisible)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                calendarVisible
-                  ? 'bg-blue-100 text-blue-700 border-blue-300'
-                  : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
-              }`}
-            >
-              {calendarVisible ? 'Calendar ON' : 'Calendar OFF'}
-            </button>
-          {watchlist.length > 0 && (
             <button
-              onClick={() => setWatchlistActive(!watchlistActive)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                watchlistActive
-                  ? 'bg-purple-100 text-purple-700 border-purple-300'
-                  : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
+              onClick={() => setCalendarVisible(!calendarVisible)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                calendarVisible
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
-              {watchlistActive ? 'Watchlist ON' : 'Watchlist OFF'}
+              Calendar
             </button>
-          )}
-          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowEconomicCalendar(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              Economic
+            </button>
+            {watchlist.length > 0 && (
+              <button
+                onClick={() => setWatchlistActive(!watchlistActive)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  watchlistActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground'
+                }`}
+              >
+                Watchlist {watchlistActive ? 'ON' : 'OFF'}
+              </button>
+            )}
+          </div>
+          
+          {/* Connection status */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
             <span
-              className={`inline-block w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`}
+              className={`w-2 h-2 rounded-full ${connected ? 'bg-success animate-pulse-glow' : 'bg-destructive'}`}
             />
-            <span className="text-gray-500">{connected ? 'Connected' : 'Disconnected'}</span>
+            <span className="text-xs text-muted-foreground hidden sm:inline">
+              {connected ? 'Live' : 'Offline'}
+            </span>
           </div>
         </div>
       </header>
@@ -154,29 +192,31 @@ export default function App() {
       {/* Macro Calendar */}
       <MacroCalendar visible={calendarVisible} />
 
-      {/* Analytics panel */}
-      {showAnalytics && (
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="grid grid-cols-3 gap-6">
-            <SectorHeatmap articles={filtered} />
-            <SourceLeaderboard articles={filtered} />
-            <KeywordTrends />
-          </div>
-        </div>
-      )}
+
 
       {/* Main content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile sidebar overlay */}
+        {mobileMenuOpen && (
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+        
         <FilterSidebar
           filters={filters}
           onChange={setFilters}
           watchlist={watchlist}
           onAddTicker={addTicker}
           onRemoveTicker={removeTicker}
+          onReorderWatchlist={reorderWatchlist}
           onFetchToday={fetchToday}
           fetching={fetching}
           alertRules={alertRules}
           onOpenAlerts={(t) => { setAlertTicker(t); setAlertModalOpen(true) }}
+          mobileOpen={mobileMenuOpen}
+          onMobileClose={() => setMobileMenuOpen(false)}
         />
         <ArticleFeed articles={filtered} loaded={loaded} onSelectArticle={setSelectedArticle} />
       </div>
@@ -193,6 +233,16 @@ export default function App() {
         ticker={alertTicker}
         watchlist={watchlist}
       />
+
+      {/* TradingView Heatmap full page */}
+      {showAnalytics && (
+        <TradingViewHeatmap onClose={() => setShowAnalytics(false)} />
+      )}
+
+      {/* TradingView Economic Calendar full page */}
+      {showEconomicCalendar && (
+        <TradingViewCalendar onClose={() => setShowEconomicCalendar(false)} />
+      )}
     </div>
   )
 }

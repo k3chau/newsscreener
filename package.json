@@ -1,0 +1,17 @@
+{
+  "name": "newsscreener",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "preinstall": "cd frontend && npm install",
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "lint": "cd frontend && npm run lint",
+    "preview": "cd frontend && npm run preview"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "recharts": "^3.8.1"
+  }
+}

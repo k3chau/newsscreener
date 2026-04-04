@@ -15,9 +15,24 @@ export const GICS_SECTORS = [
 export const SENTIMENTS = ['positive', 'negative', 'neutral']
 
 export const SENTIMENT_COLORS = {
-  positive: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
-  negative: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' },
-  neutral: { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-300' },
+  positive: { 
+    bg: 'bg-success/20', 
+    text: 'text-success', 
+    border: 'border-success/30',
+    dot: 'bg-success'
+  },
+  negative: { 
+    bg: 'bg-destructive/20', 
+    text: 'text-destructive', 
+    border: 'border-destructive/30',
+    dot: 'bg-destructive'
+  },
+  neutral: { 
+    bg: 'bg-muted', 
+    text: 'text-muted-foreground', 
+    border: 'border-border',
+    dot: 'bg-muted-foreground'
+  },
 }
 
-export const CHART_COLORS = ['#22c55e', '#ef4444', '#6b7280']
+export const CHART_COLORS = ['#22c55e', '#ef4444', '#a3a3a3']

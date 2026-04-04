@@ -44,7 +44,6 @@ export default function ArticleDetail({ article, onClose }) {
   const credScore = get(article, 'credibility.score') ?? get(article, 'credibility_score')
   const sector = get(article, 'industry.gics_sector') || get(article, 'gics_sector', '')
 
-  // Fetch price impact when modal opens
   useEffect(() => {
     if (tickers.length === 0 || !publishedAt) return
     const fetchImpact = async () => {
@@ -72,7 +71,6 @@ export default function ArticleDetail({ article, onClose }) {
     fetchImpact()
   }, [tickers, publishedAt])
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e) => {
       if (e.key === 'Escape') onClose()
@@ -81,7 +79,6 @@ export default function ArticleDetail({ article, onClose }) {
     return () => document.removeEventListener('keydown', handler)
   }, [onClose])
 
-  // Close on overlay click
   const handleOverlayClick = (e) => {
     if (e.target === overlayRef.current) onClose()
   }
@@ -108,7 +105,7 @@ export default function ArticleDetail({ article, onClose }) {
       } else {
         setAnalysis(data.analysis)
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to analysis service')
     } finally {
       setAnalyzing(false)
@@ -119,13 +116,13 @@ export default function ArticleDetail({ article, onClose }) {
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center pt-12 pb-12 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-start justify-center pt-12 pb-12 overflow-y-auto"
     >
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative">
+      <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg bg-muted hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -138,20 +135,20 @@ export default function ArticleDetail({ article, onClose }) {
             <img
               src={imageUrl}
               alt=""
-              className="w-full h-48 object-cover rounded-lg mb-4"
+              className="w-full h-48 object-cover rounded-lg mb-4 border border-border"
               onError={(e) => { e.target.style.display = 'none' }}
             />
           )}
 
           {/* Title */}
-          <h2 className="text-xl font-bold text-gray-900 mb-3 pr-8">{title}</h2>
+          <h2 className="text-xl font-bold text-foreground mb-3 pr-8">{title}</h2>
 
-          {/* Meta row: publisher, date/time */}
-          <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-            {publisher && <span className="font-medium text-gray-700">{publisher}</span>}
+          {/* Meta row */}
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+            {publisher && <span className="font-medium text-foreground">{publisher}</span>}
             {publishedAt && (
               <>
-                <span>&middot;</span>
+                <span className="text-border">|</span>
                 <span>{formatDateTime(publishedAt)}</span>
               </>
             )}
@@ -160,12 +157,12 @@ export default function ArticleDetail({ article, onClose }) {
           {/* Tickers */}
           {tickers.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Tickers</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tickers</h4>
               <div className="flex flex-wrap gap-2">
                 {tickers.map((t) => (
                   <span
                     key={t}
-                    className="px-3 py-1 bg-purple-50 text-purple-700 text-sm font-medium rounded-full border border-purple-200"
+                    className="px-3 py-1 bg-primary/20 text-primary text-sm font-medium rounded-lg"
                   >
                     ${t}
                   </span>
@@ -177,11 +174,11 @@ export default function ArticleDetail({ article, onClose }) {
           {/* Price Impact */}
           {tickers.length > 0 && publishedAt && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                 Price Impact &mdash; ${tickers[0]}
               </h4>
               {priceLoading && (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -190,18 +187,18 @@ export default function ArticleDetail({ article, onClose }) {
                 </div>
               )}
               {priceError && (
-                <p className="text-sm text-red-600">{priceError}</p>
+                <p className="text-sm text-destructive">{priceError}</p>
               )}
               {priceImpact && priceImpact.market_closed && (
-                <p className="text-sm text-gray-500">Market closed at time of publication</p>
+                <p className="text-sm text-muted-foreground">Market closed at time of publication</p>
               )}
               {priceImpact && priceImpact.no_data && (
-                <p className="text-sm text-gray-500">No price data available</p>
+                <p className="text-sm text-muted-foreground">No price data available</p>
               )}
               {priceImpact && priceImpact.impacts && priceImpact.impacts.length > 0 && !priceImpact.market_closed && (
                 <div className="flex flex-wrap gap-2">
                   {priceImpact.base_price != null && (
-                    <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                    <span className="px-3 py-1 bg-muted text-foreground text-sm rounded-lg">
                       Base: ${priceImpact.base_price.toFixed(2)}
                     </span>
                   )}
@@ -210,7 +207,7 @@ export default function ArticleDetail({ article, onClose }) {
                       return (
                         <span
                           key={imp.interval}
-                          className="px-3 py-1 bg-gray-100 text-gray-500 text-sm rounded-full border border-gray-200"
+                          className="px-3 py-1 bg-muted text-muted-foreground text-sm rounded-lg"
                         >
                           {imp.interval}: N/A
                         </span>
@@ -220,10 +217,10 @@ export default function ArticleDetail({ article, onClose }) {
                     return (
                       <span
                         key={imp.interval}
-                        className={`px-3 py-1 text-sm font-medium rounded-full border ${
+                        className={`px-3 py-1 text-sm font-medium rounded-lg ${
                           isPositive
-                            ? 'bg-green-50 text-green-700 border-green-200'
-                            : 'bg-red-50 text-red-700 border-red-200'
+                            ? 'bg-success/20 text-success'
+                            : 'bg-destructive/20 text-destructive'
                         }`}
                       >
                         {isPositive ? '+' : ''}{imp.change_pct.toFixed(2)}% ({imp.interval})
@@ -235,27 +232,27 @@ export default function ArticleDetail({ article, onClose }) {
             </div>
           )}
 
-          {/* Tags: sector, sentiment, credibility */}
+          {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
             {sector && (
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full border border-blue-200">
+              <span className="px-3 py-1 bg-secondary text-secondary-foreground text-sm rounded-lg">
                 {sector}
               </span>
             )}
             {sentimentLabel && (
-              <span className={`px-3 py-1 text-sm rounded-full border ${
-                sentimentLabel === 'positive' ? 'bg-green-50 text-green-700 border-green-200'
-                : sentimentLabel === 'negative' ? 'bg-red-50 text-red-700 border-red-200'
-                : 'bg-gray-100 text-gray-600 border-gray-200'
+              <span className={`px-3 py-1 text-sm rounded-lg font-medium ${
+                sentimentLabel === 'positive' ? 'bg-success/20 text-success'
+                : sentimentLabel === 'negative' ? 'bg-destructive/20 text-destructive'
+                : 'bg-muted text-muted-foreground'
               }`}>
-                {sentimentLabel}
+                {sentimentLabel.charAt(0).toUpperCase() + sentimentLabel.slice(1)}
               </span>
             )}
             {credScore != null && (
-              <span className={`px-3 py-1 text-sm rounded-full border ${
-                credScore >= 70 ? 'bg-green-50 text-green-700 border-green-200'
-                : credScore >= 40 ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                : 'bg-red-50 text-red-700 border-red-200'
+              <span className={`px-3 py-1 text-sm rounded-lg font-medium ${
+                credScore >= 70 ? 'bg-success/20 text-success'
+                : credScore >= 40 ? 'bg-warning/20 text-warning'
+                : 'bg-destructive/20 text-destructive'
               }`}>
                 Credibility: {credScore}/100
               </span>
@@ -265,10 +262,10 @@ export default function ArticleDetail({ article, onClose }) {
           {/* Keywords */}
           {keywords.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Keywords</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Keywords</h4>
               <div className="flex flex-wrap gap-1.5">
                 {keywords.map((k, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                  <span key={i} className="px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-md">
                     {k}
                   </span>
                 ))}
@@ -279,8 +276,8 @@ export default function ArticleDetail({ article, onClose }) {
           {/* Summary */}
           {summary && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Summary</h4>
-              <p className="text-sm text-gray-700 leading-relaxed">{summary}</p>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Summary</h4>
+              <p className="text-sm text-foreground/80 leading-relaxed">{summary}</p>
             </div>
           )}
 
@@ -291,15 +288,18 @@ export default function ArticleDetail({ article, onClose }) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-foreground bg-muted hover:bg-secondary rounded-lg transition-colors flex items-center gap-2"
               >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
                 Read Full Article
               </a>
             )}
             <button
               onClick={runAnalysis}
               disabled={analyzing}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:bg-primary/50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center gap-2"
             >
               {analyzing ? (
                 <>
@@ -310,29 +310,40 @@ export default function ArticleDetail({ article, onClose }) {
                   Analyzing...
                 </>
               ) : (
-                'Full Analysis'
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Full Analysis
+                </>
               )}
             </button>
           </div>
 
-          {/* Analysis result */}
+          {/* Analysis error */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 mb-4">
+            <div className="p-3 bg-destructive/20 border border-destructive/30 rounded-lg text-sm text-destructive mb-4">
               {error}
             </div>
           )}
 
+          {/* Analysis result */}
           {analysis && (
-            <div className="border border-indigo-200 bg-indigo-50/50 rounded-lg p-4">
-              <h4 className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-3">AI Analysis</h4>
-              <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap prose prose-sm max-w-none">
+            <div className="border border-primary/30 bg-primary/10 rounded-lg p-4">
+              <h4 className="text-xs font-semibold text-primary uppercase tracking-wide mb-3 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                AI Analysis
+              </h4>
+              <div className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
                 {analysis.split('\n').map((line, i) => {
                   if (line.startsWith('**') && line.includes('**:')) {
                     const [label, ...rest] = line.split('**:')
                     const cleanLabel = label.replace(/^\*\*/, '')
                     return (
                       <div key={i} className="mt-3 first:mt-0">
-                        <strong className="text-gray-900">{cleanLabel}:</strong>
+                        <strong className="text-foreground">{cleanLabel}:</strong>
                         {rest.join('**:')}
                       </div>
                     )
