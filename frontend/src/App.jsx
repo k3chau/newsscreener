@@ -7,6 +7,7 @@ import ArticleDetail from './components/ArticleDetail'
 import MacroCalendar from './components/MacroCalendar'
 import AlertConfig from './components/AlertConfig'
 import TradingViewHeatmap from './components/TradingViewHeatmap'
+import TradingViewCalendar from './components/TradingViewCalendar'
 
 const WS_URL =
   (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
@@ -68,6 +69,7 @@ export default function App() {
   const [selectedArticle, setSelectedArticle] = useState(null)
   const [calendarVisible, setCalendarVisible] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showEconomicCalendar, setShowEconomicCalendar] = useState(false)
   const [alertModalOpen, setAlertModalOpen] = useState(false)
   const [alertTicker, setAlertTicker] = useState('')
   const [alertRules, setAlertRules] = useState([])
@@ -152,6 +154,12 @@ export default function App() {
             >
               Calendar
             </button>
+            <button
+              onClick={() => setShowEconomicCalendar(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              Economic
+            </button>
             {watchlist.length > 0 && (
               <button
                 onClick={() => setWatchlistActive(!watchlistActive)}
@@ -229,6 +237,11 @@ export default function App() {
       {/* TradingView Heatmap full page */}
       {showAnalytics && (
         <TradingViewHeatmap onClose={() => setShowAnalytics(false)} />
+      )}
+
+      {/* TradingView Economic Calendar full page */}
+      {showEconomicCalendar && (
+        <TradingViewCalendar onClose={() => setShowEconomicCalendar(false)} />
       )}
     </div>
   )
