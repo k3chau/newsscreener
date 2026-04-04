@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import AIChat from './AIChat'
 
 export default function TradingViewHeatmap({ onClose }) {
   const containerRef = useRef(null)
@@ -93,6 +94,9 @@ export default function TradingViewHeatmap({ onClose }) {
           </div>
         </div>
       </div>
+
+      {/* AI Chat */}
+      <AIChat contextType="stocks" />
     </div>
   )
 }

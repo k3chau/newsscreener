@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import AIChat from './AIChat'
 
 export default function TradingViewCalendar({ onClose }) {
   const containerRef = useRef(null)
@@ -84,6 +85,9 @@ export default function TradingViewCalendar({ onClose }) {
           Economic data powered by TradingView
         </span>
       </footer>
+
+      {/* AI Chat */}
+      <AIChat contextType="economic" />
     </div>
   )
 }
