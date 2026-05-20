@@ -250,36 +250,9 @@ export default function FilterSidebar({
         </div>
       </div>
 
-      {/* Credibility slider */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-muted-foreground mb-2">
-          Min Credibility
-        </label>
-        <div className="relative">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={filters.minCredibility}
-            onChange={(e) => update('minCredibility', Number(e.target.value))}
-            className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
-          />
-          <div 
-            className="absolute -top-6 transform -translate-x-1/2 px-2 py-1 bg-primary text-primary-foreground text-xs font-bold rounded"
-            style={{ left: `${filters.minCredibility}%` }}
-          >
-            {filters.minCredibility}
-          </div>
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-          <span>0</span>
-          <span>100</span>
-        </div>
-      </div>
-
       {/* Reset */}
       <button
-        onClick={() => onChange({ ticker: '', sector: '', sentiment: '', minCredibility: 0 })}
+        onClick={() => onChange({ ticker: '', sector: '', sentiment: '' })}
         className="w-full py-2.5 text-sm text-muted-foreground hover:text-foreground border border-border hover:border-foreground/20 rounded-lg transition-all flex items-center justify-center gap-2"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

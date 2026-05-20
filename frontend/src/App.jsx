@@ -14,7 +14,7 @@ const WS_URL =
   window.location.host +
   '/ws/articles'
 
-const DEFAULT_FILTERS = { ticker: '', sector: '', sentiment: '', minCredibility: 0 }
+const DEFAULT_FILTERS = { ticker: '', sector: '', sentiment: '' }
 const WATCHLIST_KEY = 'newsscreener_watchlist'
 
 function loadWatchlist() {
@@ -53,10 +53,6 @@ function matchFilters(article, filters, watchlist) {
   if (filters.sentiment) {
     const label = get(article, 'sentiment.label') || get(article, 'sentiment_label') || ''
     if (label !== filters.sentiment) return false
-  }
-  if (filters.minCredibility > 0) {
-    const score = get(article, 'credibility.score') ?? get(article, 'credibility_score') ?? 0
-    if (score < filters.minCredibility) return false
   }
   return true
 }
